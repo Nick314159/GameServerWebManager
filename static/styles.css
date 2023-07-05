@@ -1,0 +1,44 @@
+.inline-header {
+    display: inline-block;
+}
+
+body {
+    background-color: #1a1a1d;
+    color: #f3f3f3;
+}
+
+.card {
+    background-color: #28282a;
+    color: #f3f3f3;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.btn {
+    border: 1px solid #f3f3f3;
+}
+
+.btn-success {
+    background-color: #1f7a1f;
+    color: #f3f3f3;
+}
+
+.btn-danger {
+    background-color: #7a1f1f;
+    color: #f3f3f3;
+}
+
+.btn-warning {
+    background-color: #7a7a1f;
+    color: #f3f3f3;
+}
+
+.list-group-item {
+    background-color: #28282a;
+    color: #f3f3f3;
+}
