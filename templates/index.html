@@ -5,6 +5,8 @@
     <!-- Other head elements -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Your CSS file link -->
 </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class="container">
     <div class="text-center my-4">
         <img src="{{ url_for('static', filename='images/logo.webp') }}" alt="My Image">
@@ -14,12 +16,12 @@
         <ul class="list-group list-group-flush">
             {% for server in servers %}
             <li class="list-group-item">
-                    <div class="col text-left" style="display: inline-block;">
-                        <h3 class="inline-header">{{ server.name }}</h3>
-                    </div>
-                    <div class="col rightalign" style="display: inline-block;">
-                        <div id="{{ server.name }}-status-indicator" class="status-indicator">&nbsp;</div>
-                        <script>
+                <div class="col text-left" style="display: inline-block;">
+                    <h3 class="inline-header">{{ server.name }}</h3>
+                </div>
+                <div class="col rightalign" style="display: inline-block;">
+                    <div id="{{ server.name }}-status-indicator" class="status-indicator">&nbsp;</div>
+                    <script>
                         function checkStatus() {
                             {% for server in servers %}
                             fetch('/check/{{ server.name }}')
@@ -42,22 +44,33 @@
 
 
 
-                        </script>
-                        <button id="start-{{ server.name }}" class="btn btn-success start-server">Start</button>
-                        <button id="stop-{{ server.name }}" class="btn btn-danger stop-server">Shutdown</button>
-                        <button id="restart-{{ server.name }}" class="btn btn-warning restart-server">Restart</button>
 
-                        <script>
+                    </script>
+                    <button id="start-{{ server.name }}" class="spinner-button btn btn-success start-server"><i
+                            class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
+                    </button>
+                    <button id="stop-{{ server.name }}" class="spinner-button btn btn-danger stop-server"><i
+                            class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Shutdown
+                    </button>
+                    <button id="restart-{{ server.name }}" class="spinner-button btn btn-warning restart-server"><i
+                            class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
+                    </button>
+
+                    <script>
                         // For the Start buttons
                         document.querySelectorAll('.start-server').forEach(button => {
                             button.addEventListener('click', function(event) {
                                 event.preventDefault();
+
+                                $(this).find('.fa-circle-o-notch').show();
+
                                 const serverName = this.id.replace('start-', '');
                                 fetch(`/start/${serverName}`)
                                     .then(response => response.text())
                                     .then(data => {
                                         console.log(`Server ${serverName} start status: ${data}`);
                                         checkStatus();
+                                        $(this).find('.fa-circle-o-notch').hide();
                                     });
                             });
                         });
@@ -66,12 +79,16 @@
                         document.querySelectorAll('.stop-server').forEach(button => {
                             button.addEventListener('click', function(event) {
                                 event.preventDefault();
+
+                                $(this).find('.fa-circle-o-notch').show();
+
                                 const serverName = this.id.replace('stop-', '');
                                 fetch(`/stop/${serverName}`)
                                     .then(response => response.text())
                                     .then(data => {
                                         console.log(`Server ${serverName} stop status: ${data}`);
                                         checkStatus();
+                                        $(this).find('.fa-circle-o-notch').hide();
                                     });
                             });
                         });
@@ -80,21 +97,27 @@
                         document.querySelectorAll('.restart-server').forEach(button => {
                             button.addEventListener('click', function(event) {
                                 event.preventDefault();
+
+                                $(this).find('.fa-circle-o-notch').show();
+
                                 const serverName = this.id.replace('restart-', '');
                                 fetch(`/restart/${serverName}`)
                                     .then(response => response.text())
                                     .then(data => {
                                         console.log(`Server ${serverName} restart status: ${data}`);
                                         checkStatus();
+                                        $(this).find('.fa-circle-o-notch').hide();
+
                                     });
                             });
                         });
 
 
 
-                        </script>
 
-                    </div>
+                    </script>
+
+                </div>
             </li>
             {% endfor %}
         </ul>
