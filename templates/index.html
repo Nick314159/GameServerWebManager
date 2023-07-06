@@ -19,27 +19,27 @@
                 <div align="right">
                     <div id="{{ server.name }}-status-indicator" class="status-indicator">&nbsp;</div>
                     <script>
-function checkStatus() {
-    {% for server in servers %}
-    fetch('/check/{{ server.name }}')
-        .then(response => response.text())
-        .then(data => {
-            const serverStatusIndicator = document.querySelector('#{{ server.name }}-status-indicator');
-            serverStatusIndicator.style.backgroundColor = data === 'online' ? 'green' : 'red';
-        });
-    {% endfor %}
-}
+                        function checkStatus() {
+                            {% for server in servers %}
+                            fetch('/check/{{ server.name }}')
+                                .then(response => response.text())
+                                .then(data => {
+                                    const serverStatusIndicator = document.querySelector('#{{ server.name }}-status-indicator');
+                                    serverStatusIndicator.style.backgroundColor = data === 'online' ? 'green' : 'red';
+                                });
+                            {% endfor %}
+                        }
 
-// Call the checkStatus function initially
-checkStatus();
+                        // Call the checkStatus function initially
+                        checkStatus();
 
-// Call the checkStatus function every 5 seconds
-setInterval(checkStatus, 5000);
-
+                        // Call the checkStatus function every 5 seconds
+                        setInterval(checkStatus, 5000);
                     </script>
-                    <button class="btn btn-success">Start</button>
-                    <button class="btn btn-danger">Shutdown</button>
-                    <button class="btn btn-warning">Restart</button>
+                    <a href="{{ url_for('start', name=server.name) }}" class="btn btn-success">Start</a>
+                    <a href="{{ url_for('stop', name=server.name) }}" class="btn btn-danger">Shutdown</a>
+                    <a href="{{ url_for('restart', name=server.name) }}" class="btn btn-warning">Restart</a>
+
                 </div>
             </li>
             {% endfor %}

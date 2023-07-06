@@ -1,3 +1,5 @@
+from time import sleep
+
 from flask import Flask, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap
 import subprocess
@@ -18,9 +20,33 @@ def index():
 @app.route('/start/<name>')
 def start(name):
     server = next((s for s in servers if s['name'] == name), None)
+    if server['status'] == "online":
+        return f"Server {name} is already online"
     if server:
         subprocess.run(['bash', server['start']])
-    return redirect(url_for('index'))
+
+@app.route('/stop/<name>')
+def stop(name):
+    server = next((s for s in servers if s['name'] == name), None)
+    if server['status'] == "offline":
+        return f"Server {name} is already offline"
+    if server:
+        subprocess.run(['screen', '-S', server['screen'], '-X', 'stuff', '^C'])
+        sleep(5)  # Give the server some time to properly shut down
+        subprocess.run(['screen', '-S', server['screen'], '-X', 'quit'])
+        return redirect(url_for('index'))
+
+
+@app.route('/restart/<name>')
+def restart(name):
+    server = next((s for s in servers if s['name'] == name), None)
+    if server['status'] == "offline":
+        return f"Server {name} is already offline"
+    else:
+        stop(name)
+    sleep(3)
+    start(name)
+
 
 @app.route('/check/<name>')
 def checkStatus(name):
