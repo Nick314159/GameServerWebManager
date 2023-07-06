@@ -13,13 +13,13 @@
     <div class="card">
         <ul class="list-group list-group-flush">
             {% for server in servers %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div align="left">
-                    <h3 class="inline-header">{{ server.name }}</h3>
-                </div>
-                <div align="right">
-                    <div id="{{ server.name }}-status-indicator" class="status-indicator">&nbsp;</div>
-                    <script>
+            <li class="list-group-item">
+                    <div class="col text-left" style="display: inline-block;">
+                        <h3 class="inline-header">{{ server.name }}</h3>
+                    </div>
+                    <div class="col rightalign" style="display: inline-block;">
+                        <div id="{{ server.name }}-status-indicator" class="status-indicator">&nbsp;</div>
+                        <script>
                         function checkStatus() {
                             {% for server in servers %}
                             fetch('/check/{{ server.name }}')
@@ -39,12 +39,15 @@
 
 
 
-                    </script>
-                    <button id="start-{{ server.name }}" class="btn btn-success start-server">Start</button>
-                    <button id="stop-{{ server.name }}" class="btn btn-danger stop-server">Shutdown</button>
-                    <button id="restart-{{ server.name }}" class="btn btn-warning restart-server">Restart</button>
 
-                    <script>
+
+
+                        </script>
+                        <button id="start-{{ server.name }}" class="btn btn-success start-server">Start</button>
+                        <button id="stop-{{ server.name }}" class="btn btn-danger stop-server">Shutdown</button>
+                        <button id="restart-{{ server.name }}" class="btn btn-warning restart-server">Restart</button>
+
+                        <script>
                         // For the Start buttons
                         document.querySelectorAll('.start-server').forEach(button => {
                             button.addEventListener('click', function(event) {
@@ -86,9 +89,12 @@
                                     });
                             });
                         });
-                    </script>
 
-                </div>
+
+
+                        </script>
+
+                    </div>
             </li>
             {% endfor %}
         </ul>

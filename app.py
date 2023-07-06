@@ -32,6 +32,7 @@ def start(name):
 
 @app.route('/stop/<name>')
 def stop(name):
+    #@TODO @BUG when the button is pushed on webpage, this call is excuted twice, reason unknown.
     server = next((s for s in servers if s['name'] == name), None)
     checkStatus(name)
     if server['status'] == "offline":

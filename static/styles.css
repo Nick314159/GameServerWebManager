@@ -42,3 +42,9 @@ body {
     background-color: #28282a;
     color: #f3f3f3;
 }
+
+.rightalign {
+    float: right;
+    position:relative;
+    top:15px;
+    }
