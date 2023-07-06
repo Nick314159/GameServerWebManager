@@ -10,6 +10,7 @@ Bootstrap(app)
 servers = [
     {'name': 'Arma3', 'start': '/home/game/Arma3Server/startServer.sh', 'screen': 'arma3', 'status': 'unknown'},
     {'name': 'Squad', 'start': 'home/game/SquadServer/startServer.sh', 'screen': 'squad', 'status': 'unknown'},
+    {'name': 'test', 'start': './test.sh', 'screen': 'test', 'status': 'unknown'},
     {'name': 'Wreckfest', 'start': 'home/game/WreckfestServer/startServer.sh', 'screen': 'wreckfest','status': 'unknown'}
 ]
 
@@ -20,19 +21,24 @@ def index():
 @app.route('/start/<name>')
 def start(name):
     server = next((s for s in servers if s['name'] == name), None)
+    checkStatus(name)
     if server['status'] == "online":
         return f"Server {name} is already online"
     if server:
-        subprocess.run(['bash', server['start']])
+        subprocess.run(['screen', '-dmS', server['screen']])
+        sleep(1)
+        subprocess.run(['screen', '-S', server['screen'], '-X', 'stuff', server['start']+'\n'])
+        # subprocess.run(['bash', server['start']])
 
 @app.route('/stop/<name>')
 def stop(name):
     server = next((s for s in servers if s['name'] == name), None)
+    checkStatus(name)
     if server['status'] == "offline":
         return f"Server {name} is already offline"
     if server:
         subprocess.run(['screen', '-S', server['screen'], '-X', 'stuff', '^C'])
-        sleep(5)  # Give the server some time to properly shut down
+        # sleep(5)  # Give the server some time to properly shut down
         subprocess.run(['screen', '-S', server['screen'], '-X', 'quit'])
         return redirect(url_for('index'))
 

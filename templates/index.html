@@ -37,10 +37,56 @@
                         // Call the checkStatus function every 5 seconds
                         setInterval(checkStatus, 5000);
 
+
+
                     </script>
-                    <a href="{{ url_for('start', name=server.name) }}" class="btn btn-success">Start</a>
-                    <a href="{{ url_for('stop', name=server.name) }}" class="btn btn-danger">Shutdown</a>
-                    <a href="{{ url_for('restart', name=server.name) }}" class="btn btn-warning">Restart</a>
+                    <button id="start-{{ server.name }}" class="btn btn-success start-server">Start</button>
+                    <button id="stop-{{ server.name }}" class="btn btn-danger stop-server">Shutdown</button>
+                    <button id="restart-{{ server.name }}" class="btn btn-warning restart-server">Restart</button>
+
+                    <script>
+                        // For the Start buttons
+                        document.querySelectorAll('.start-server').forEach(button => {
+                            button.addEventListener('click', function(event) {
+                                event.preventDefault();
+                                const serverName = this.id.replace('start-', '');
+                                fetch(`/start/${serverName}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        console.log(`Server ${serverName} start status: ${data}`);
+                                        checkStatus();
+                                    });
+                            });
+                        });
+
+                        // For the Stop buttons
+                        document.querySelectorAll('.stop-server').forEach(button => {
+                            button.addEventListener('click', function(event) {
+                                event.preventDefault();
+                                const serverName = this.id.replace('stop-', '');
+                                fetch(`/stop/${serverName}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        console.log(`Server ${serverName} stop status: ${data}`);
+                                        checkStatus();
+                                    });
+                            });
+                        });
+
+                        // For the Restart buttons
+                        document.querySelectorAll('.restart-server').forEach(button => {
+                            button.addEventListener('click', function(event) {
+                                event.preventDefault();
+                                const serverName = this.id.replace('restart-', '');
+                                fetch(`/restart/${serverName}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        console.log(`Server ${serverName} restart status: ${data}`);
+                                        checkStatus();
+                                    });
+                            });
+                        });
+                    </script>
 
                 </div>
             </li>
