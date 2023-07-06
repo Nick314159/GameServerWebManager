@@ -7,6 +7,7 @@
 </head>
 <div class="container">
     <div class="text-center my-4">
+        <img src="{{ url_for('static', filename='images/logo.webp') }}" alt="My Image">
         <h1>Black Squadron Gaming Server Manager</h1>
     </div>
     <div class="card">
@@ -35,6 +36,7 @@
 
                         // Call the checkStatus function every 5 seconds
                         setInterval(checkStatus, 5000);
+
                     </script>
                     <a href="{{ url_for('start', name=server.name) }}" class="btn btn-success">Start</a>
                     <a href="{{ url_for('stop', name=server.name) }}" class="btn btn-danger">Shutdown</a>
