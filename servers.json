@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Arma3",
+        "start": "/home/game/Arma3Server/startServer.sh",
+        "screen": "arma3"
+    },
+    {
+        "name": "Squad",
+        "start": "home/game/SquadServer/startServer.sh",
+        "screen": "squad"
+    },
+    {
+        "name": "test",
+        "start": "./test.sh",
+        "screen": "test"
+    },
+    {
+        "name": "Wreckfest",
+        "start": "home/game/WreckfestServer/startServer.sh",
+        "screen": "wreckfest"
+    }
+]

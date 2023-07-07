@@ -5,18 +5,59 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_bootstrap import Bootstrap
 import subprocess
 import os
+import json
 
 app = Flask("BlackSquadronGamingServerManager")
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 Bootstrap(app)
 
-servers = [
-    {'name': 'Arma3', 'start': '/home/game/Arma3Server/startServer.sh', 'screen': 'arma3', 'status': 'unknown'},
-    {'name': 'Squad', 'start': 'home/game/SquadServer/startServer.sh', 'screen': 'squad', 'status': 'unknown'},
-    {'name': 'test', 'start': './test.sh', 'screen': 'test', 'status': 'unknown'},
-    {'name': 'Wreckfest', 'start': 'home/game/WreckfestServer/startServer.sh', 'screen': 'wreckfest','status': 'unknown'}
-]
 
+# servers = [
+#     {'name': 'Arma3', 'start': '/home/game/Arma3Server/startServer.sh', 'screen': 'arma3', 'status': 'unknown'},
+#     {'name': 'Squad', 'start': 'home/game/SquadServer/startServer.sh', 'screen': 'squad', 'status': 'unknown'},
+#     {'name': 'test', 'start': './test.sh', 'screen': 'test', 'status': 'unknown'},
+#     {'name': 'Wreckfest', 'start': 'home/game/WreckfestServer/startServer.sh', 'screen': 'wreckfest','status': 'unknown'}
+# ]
+class ServerController:
+    def __init__(self, server):
+        self.server = server
+
+    def start(self):
+        if self.check_status() == "online":
+            return f"Server {self.server['name']} is already online"
+        subprocess.run(['screen', '-dmS', self.server['screen']])
+        sleep(1)
+        subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', self.server['start'] + '\n'])
+
+    def stop(self):
+        if self.check_status() == "offline":
+            return f"Server {self.server['name']} is already offline"
+        subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
+        subprocess.run(['screen', '-S', self.server['screen'], '-X', 'quit'])
+
+    def restart(self):
+        if self.check_status() == "online":
+            self.stop()
+        sleep(3)
+        if self.check_status() == "offline":
+            self.start()
+
+    def check_status(self):
+        result = subprocess.run(['screen', '-ls'], stdout=subprocess.PIPE)
+        output = result.stdout.decode()
+        if output.startswith('No Sockets') or self.server['screen'] not in output:
+            return "offline"
+        else:
+            return "online"
+
+    def to_dict(self):
+        return self.server
+
+
+# Load server data from a JSON file
+with open('servers.json', 'r') as file:
+    server_controllers = {s['name']: ServerController(s) for s in json.load(file)}
+    servers = [controller.to_dict() for controller in server_controllers.values()]
 
 # Setup Flask-Login
 login_manager = LoginManager()
@@ -28,78 +69,17 @@ class User(UserMixin):
     def __init__(self, id):
         self.id = id
 
+
 # This is where you'd usually use a database,
 # but we'll use a dict to keep it simple
 users = {'admin': {'password': 'securepassword'}}
+
 
 # Tell flask-login how to load a user
 @login_manager.user_loader
 def load_user(user_id):
     return User(user_id)
 
-@app.route('/')
-@login_required
-def index():
-    return render_template('index.html', servers=servers)
-
-@app.route('/start/<name>')
-@login_required
-def start(name):
-    server = next((s for s in servers if s['name'] == name), None)
-    checkStatus(name)
-    if server['status'] == "online":
-        return f"Server {name} is already online"
-    if server:
-        subprocess.run(['screen', '-dmS', server['screen']])
-        sleep(1)
-        subprocess.run(['screen', '-S', server['screen'], '-X', 'stuff', server['start']+'\n'])
-        # subprocess.run(['bash', server['start']])
-
-@app.route('/stop/<name>')
-@login_required
-def stop(name):
-    #@TODO @BUG when the button is pushed on webpage, this call is excuted twice, reason unknown.
-    server = next((s for s in servers if s['name'] == name), None)
-    checkStatus(name)
-    if server['status'] == "offline":
-        return f"Server {name} is already offline"
-    if server:
-        subprocess.run(['screen', '-S', server['screen'], '-X', 'stuff', '^C'])
-        # sleep(5)  # Give the server some time to properly shut down
-        subprocess.run(['screen', '-S', server['screen'], '-X', 'quit'])
-        return redirect(url_for('index'))
-
-
-@app.route('/restart/<name>')
-@login_required
-def restart(name):
-    server = next((s for s in servers if s['name'] == name), None)
-    checkStatus(server)
-    if server['status'] == "online":
-        stop(name)
-    sleep(3)
-    if server['status'] == "offline":
-        start(name)
-
-
-@app.route('/check/<name>')
-@login_required
-def checkStatus(name):
-    server = next((s for s in servers if s['name'] == name), None)
-    if server:
-        result = subprocess.run(['screen', '-ls'], stdout=subprocess.PIPE)
-        output = result.stdout.decode()
-        if output.startswith('No Sockets'):
-            server['status'] = "offline"
-            return "offline"
-        if server['screen'] in output:
-            server['status'] = "online"
-            return "online"
-        else:
-            server['status'] = "offline"
-            return "offline"
-    else:
-        return f"No server found with the name {name}"
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -115,6 +95,7 @@ def login():
     else:
         return render_template('login.html')
 
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -122,3 +103,37 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/')
+@login_required
+def index():
+    return render_template('index.html', servers=servers)
+
+
+@app.route('/start/<name>')
+@login_required
+def start(name):
+    controller = server_controllers.get(name)
+    if controller:
+        controller.start()
+
+
+@app.route('/stop/<name>')
+@login_required
+def stop(name):
+    controller = server_controllers.get(name)
+    if controller:
+        controller.stop()
+
+
+@app.route('/restart/<name>')
+@login_required
+def restart(name):
+    controller = server_controllers.get(name)
+    if controller:
+        controller.restart()
+
+@app.route('/check/<name>')
+@login_required
+def checkStatus(name):
+    controller = server_controllers.get(name)
+    return controller.check_status() if controller else f"No server found with the name {name}"
