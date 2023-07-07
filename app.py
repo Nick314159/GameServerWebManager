@@ -37,6 +37,7 @@ class ServerController:
             subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
         else:
             subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', self.server['stop'] + '\n'])
+        sleep(15) #Some games take a while to shut down properly.
         subprocess.run(['screen', '-S', self.server['screen'], '-X', 'quit'])
 
     def restart(self):

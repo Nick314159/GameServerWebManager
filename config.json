@@ -3,25 +3,25 @@
   "servers": [
     {
       "name": "Arma3",
-      "start": "/home/game/Arma3Server/startServer.sh",
+      "start": "/home/game/Arma3Server/startserver.sh",
       "stop": "",
       "screen": "arma3"
     },
     {
       "name": "Squad",
-      "start": "home/game/SquadServer/startServer.sh",
+      "start": "/home/game/SquadServer/startserver.sh",
       "stop": "",
       "screen": "squad"
     },
     {
-      "name": "test",
-      "start": "./test.sh",
-      "stop": "./stoptest.sh",
-      "screen": "test"
+      "name": "Unity Station",
+      "start": "/home/game/UnityStation/startserver.sh",
+      "stop": "/home/game/UnityStation/stopserver.sh",
+      "screen": "unity"
     },
     {
       "name": "Wreckfest",
-      "start": "home/game/WreckfestServer/startServer.sh",
+      "start": "/home/game/WreckfestServer/startserver.sh",
       "stop": "",
       "screen": "wreckfest"
     }
