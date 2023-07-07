@@ -33,7 +33,10 @@ class ServerController:
     def stop(self):
         if self.check_status() == "offline":
             return f"Server {self.server['name']} is already offline"
-        subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
+        if self.server['stop'] == "":
+            subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
+        else:
+            subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', self.server['stop'] + '\n'])
         subprocess.run(['screen', '-S', self.server['screen'], '-X', 'quit'])
 
     def restart(self):
