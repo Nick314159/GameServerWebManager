@@ -48,3 +48,8 @@ body {
     position:relative;
     top:15px;
     }
+
+.btn-logout {
+    background-color: grey;
+    color: #f3f3f3;
+}

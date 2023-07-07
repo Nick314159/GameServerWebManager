@@ -1,10 +1,13 @@
 from time import sleep
-
+from flask import request
 from flask import Flask, render_template, redirect, url_for
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
 import subprocess
+import os
 
 app = Flask("BlackSquadronGamingServerManager")
+app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 Bootstrap(app)
 
 servers = [
@@ -14,11 +17,33 @@ servers = [
     {'name': 'Wreckfest', 'start': 'home/game/WreckfestServer/startServer.sh', 'screen': 'wreckfest','status': 'unknown'}
 ]
 
+
+# Setup Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Name of the login view
+
+# Mock user
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+# This is where you'd usually use a database,
+# but we'll use a dict to keep it simple
+users = {'admin': {'password': 'securepassword'}}
+
+# Tell flask-login how to load a user
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
+
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html', servers=servers)
 
 @app.route('/start/<name>')
+@login_required
 def start(name):
     server = next((s for s in servers if s['name'] == name), None)
     checkStatus(name)
@@ -31,6 +56,7 @@ def start(name):
         # subprocess.run(['bash', server['start']])
 
 @app.route('/stop/<name>')
+@login_required
 def stop(name):
     #@TODO @BUG when the button is pushed on webpage, this call is excuted twice, reason unknown.
     server = next((s for s in servers if s['name'] == name), None)
@@ -45,17 +71,19 @@ def stop(name):
 
 
 @app.route('/restart/<name>')
+@login_required
 def restart(name):
     server = next((s for s in servers if s['name'] == name), None)
-    if server['status'] == "offline":
-        return f"Server {name} is already offline"
-    else:
+    checkStatus(server)
+    if server['status'] == "online":
         stop(name)
     sleep(3)
-    start(name)
+    if server['status'] == "offline":
+        start(name)
 
 
 @app.route('/check/<name>')
+@login_required
 def checkStatus(name):
     server = next((s for s in servers if s['name'] == name), None)
     if server:
@@ -72,4 +100,31 @@ def checkStatus(name):
             return "offline"
     else:
         return f"No server found with the name {name}"
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if (username in users) and (password == users[username]['password']):
+            user = User(username)
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            return "Invalid credentials", 401
+    else:
+        return '''
+            <form method="POST">
+                Username: <input type="text" name="username"><br>
+                Password: <input type="password" name="password"><br>
+                <input type="submit" value="Submit">
+            </form>
+        '''
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 

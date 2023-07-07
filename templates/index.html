@@ -32,18 +32,8 @@
                                 });
                             {% endfor %}
                         }
-
-                        // Call the checkStatus function initially
                         checkStatus();
-
-                        // Call the checkStatus function every 5 seconds
                         setInterval(checkStatus, 5000);
-
-
-
-
-
-
 
                     </script>
                     <button id="start-{{ server.name }}" class="spinner-button btn btn-success start-server"><i
@@ -121,6 +111,9 @@
             </li>
             {% endfor %}
         </ul>
+        <div>
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary rightalign btn-logout">Logout</a>
+        </div>
     </div>
 </div>
 {% endblock %}
