@@ -1,0 +1,26 @@
+{
+  "applicationVersion": "1.0.0",
+  "databaseURI": "mongodb://localhost:27017/mydatabase",
+  "servers": [
+    {
+      "name": "Arma3",
+      "start": "/home/game/Arma3Server/startServer.sh",
+      "screen": "arma3"
+    },
+    {
+      "name": "Squad",
+      "start": "home/game/SquadServer/startServer.sh",
+      "screen": "squad"
+    },
+    {
+      "name": "test",
+      "start": "./test.sh",
+      "screen": "test"
+    },
+    {
+      "name": "Wreckfest",
+      "start": "home/game/WreckfestServer/startServer.sh",
+      "screen": "wreckfest"
+    }
+  ]
+}

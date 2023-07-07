@@ -55,9 +55,11 @@ class ServerController:
 
 
 # Load server data from a JSON file
-with open('servers.json', 'r') as file:
-    server_controllers = {s['name']: ServerController(s) for s in json.load(file)}
-    servers = [controller.to_dict() for controller in server_controllers.values()]
+with open('config.json', 'r') as file:
+    config = json.load(file)
+
+server_controllers = {s['name']: ServerController(s) for s in config['servers']}
+servers = [controller.to_dict() for controller in server_controllers.values()]
 
 # Setup Flask-Login
 login_manager = LoginManager()
