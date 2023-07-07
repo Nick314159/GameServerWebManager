@@ -4,6 +4,7 @@ from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
 import subprocess
+import bcrypt
 import os
 import json
 
@@ -71,10 +72,7 @@ class User(UserMixin):
     def __init__(self, id):
         self.id = id
 
-
-# This is where you'd usually use a database,
-# but we'll use a dict to keep it simple
-users = {'admin': {'password': 'securepassword'}}
+users = {user['username']: user['password'] for user in config['users']}
 
 
 # Tell flask-login how to load a user
@@ -88,9 +86,10 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        if (username in users) and (password == users[username]['password']):
-            user = User(username)
-            login_user(user)
+        user = next((user for user in config['users'] if user['username'] == username), None)
+        if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+            user_obj = User(username)
+            login_user(user_obj)
             return redirect(url_for('index'))
         else:
             return "Invalid credentials", 401

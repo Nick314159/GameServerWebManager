@@ -1,6 +1,5 @@
 {
   "applicationVersion": "1.0.0",
-  "databaseURI": "mongodb://localhost:27017/mydatabase",
   "servers": [
     {
       "name": "Arma3",
@@ -21,6 +20,12 @@
       "name": "Wreckfest",
       "start": "home/game/WreckfestServer/startServer.sh",
       "screen": "wreckfest"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": "$2b$12$6GcIluHQNjuNyf/DjvPxJ.vT3iXobF3PNmN4IjpykzgR4/gLyRaE2"
     }
   ]
 }
