@@ -113,13 +113,7 @@ def login():
         else:
             return "Invalid credentials", 401
     else:
-        return '''
-            <form method="POST">
-                Username: <input type="text" name="username"><br>
-                Password: <input type="password" name="password"><br>
-                <input type="submit" value="Submit">
-            </form>
-        '''
+        return render_template('login.html')
 
 @app.route('/logout')
 @login_required

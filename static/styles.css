@@ -47,9 +47,21 @@ body {
     float: right;
     position:relative;
     top:15px;
-    }
+}
 
 .btn-logout {
     background-color: grey;
     color: #f3f3f3;
+}
+
+.btn-login {
+    background-color: grey;
+    color: #f3f3f3;
+}
+
+.center {
+ border: 5px solid;
+  margin: auto;
+  width: 32%;
+  padding: 10px;
 }

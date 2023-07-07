@@ -1,0 +1,21 @@
+{% extends "bootstrap/base.html" %}
+
+{% block content %}
+<head>
+    <!-- Other head elements -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Your CSS file link -->
+</head>
+<div class="text-center my-4">
+    <img src="{{ url_for('static', filename='images/logo.webp') }}" alt="My Image">
+    <h1>Black Squadron Gaming Server Manager</h1>
+</div>
+<div class="center">
+    <form method="POST">
+    Username: <input type="text" name="username" style="color:black;"><br>
+    Password: <input type="password" name="password" style="color:black;position:relative;left:2px;"><br>
+    <input type="submit" class="btn-login" value="Login">
+</form>
+
+</div>
+
+{% endblock %}
