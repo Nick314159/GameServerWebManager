@@ -20,14 +20,14 @@
                     <h3 class="inline-header">{{ server.name }}</h3>
                 </div>
                 <div class="col rightalign" style="display: inline-block;">
-                    <div id="{{ server.name }}-status-indicator" class="status-indicator">&nbsp;</div>
+                    <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="status-indicator">&nbsp;</div>
                     <script>
                         function checkStatus() {
                             {% for server in servers %}
                             fetch('/check/{{ server.name }}')
                                 .then(response => response.text())
                                 .then(data => {
-                                    const serverStatusIndicator = document.querySelector('#{{ server.name }}-status-indicator');
+                                    const serverStatusIndicator = document.querySelector('#{{ server.name.replace(' ', '_') }}-status-indicator');
                                     serverStatusIndicator.style.backgroundColor = data === 'online' ? 'green' : 'red';
                                 });
                             {% endfor %}
@@ -36,13 +36,13 @@
                         setInterval(checkStatus, 5000);
 
                     </script>
-                    <button id="start-{{ server.name }}" class="spinner-button btn btn-success start-server"><i
+                    <button id="start-{{ server.name.replace(' ', '_') }}" class="spinner-button btn btn-success start-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
                     </button>
-                    <button id="stop-{{ server.name }}" class="spinner-button btn btn-danger stop-server"><i
+                    <button id="stop-{{ server.name.replace(' ', '_') }}" class="spinner-button btn btn-danger stop-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Shutdown
                     </button>
-                    <button id="restart-{{ server.name }}" class="spinner-button btn btn-warning restart-server"><i
+                    <button id="restart-{{ server.name.replace(' ', '_') }}" class="spinner-button btn btn-warning restart-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
                     </button>
 
