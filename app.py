@@ -109,39 +109,42 @@ def logout():
 
 
 @app.route('/')
-@login_required
+@app.route('/dashboard')
 def index():
     return render_template('index.html', servers=servers)
 
 
 @app.route('/start/<name>')
-@login_required
 def start(name):
-    name = name.replace('_', ' ')
-    controller = server_controllers.get(name)
-    if controller:
-        controller.start()
-
+    if current_user.is_authenticated:
+        name = name.replace('_', ' ')
+        controller = server_controllers.get(name)
+        if controller:
+            controller.start()
+    else:
+        return "Unauthorized", 401
 
 @app.route('/stop/<name>')
-@login_required
 def stop(name):
-    name = name.replace('_', ' ')
-    controller = server_controllers.get(name)
-    if controller:
-        controller.stop()
-
+    if current_user.is_authenticated:
+        name = name.replace('_', ' ')
+        controller = server_controllers.get(name)
+        if controller:
+            controller.stop()
+    else:
+        return "Unauthorized", 401
 
 @app.route('/restart/<name>')
-@login_required
 def restart(name):
-    name = name.replace('_', ' ')
-    controller = server_controllers.get(name)
-    if controller:
-        controller.restart()
+    if current_user.is_authenticated:
+        name = name.replace('_', ' ')
+        controller = server_controllers.get(name)
+        if controller:
+            controller.restart()
+    else:
+        return "Unauthorized", 401
 
 @app.route('/check/<name>')
-@login_required
 def checkStatus(name):
     name = name.replace('_', ' ')
     controller = server_controllers.get(name)

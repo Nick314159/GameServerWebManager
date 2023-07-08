@@ -35,14 +35,19 @@
                         checkStatus();
                         setInterval(checkStatus, 5000);
 
+
+
                     </script>
-                    <button id="start-{{ server.name.replace(' ', '_') }}" class="spinner-button btn btn-success start-server"><i
+                    <button id="start-{{ server.name.replace(' ', '_') }}"
+                            class="spinner-button btn btn-success start-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
                     </button>
-                    <button id="stop-{{ server.name.replace(' ', '_') }}" class="spinner-button btn btn-danger stop-server"><i
+                    <button id="stop-{{ server.name.replace(' ', '_') }}"
+                            class="spinner-button btn btn-danger stop-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Shutdown
                     </button>
-                    <button id="restart-{{ server.name.replace(' ', '_') }}" class="spinner-button btn btn-warning restart-server"><i
+                    <button id="restart-{{ server.name.replace(' ', '_') }}"
+                            class="spinner-button btn btn-warning restart-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
                     </button>
 
@@ -56,7 +61,13 @@
 
                                 const serverName = this.id.replace('start-', '');
                                 fetch(`/start/${serverName}`)
-                                    .then(response => response.text())
+                                    .then(response => {
+                                        if (response.status === 401) {
+                                            window.location.href = "/login";
+                                        } else {
+                                            return response.text();
+                                        }
+                                    })
                                     .then(data => {
                                         console.log(`Server ${serverName} start status: ${data}`);
                                         checkStatus();
@@ -74,7 +85,13 @@
 
                                 const serverName = this.id.replace('stop-', '');
                                 fetch(`/stop/${serverName}`)
-                                    .then(response => response.text())
+                                    .then(response => {
+                                        if (response.status === 401) {
+                                            window.location.href = "/login";
+                                        } else {
+                                            return response.text();
+                                        }
+                                    })
                                     .then(data => {
                                         console.log(`Server ${serverName} stop status: ${data}`);
                                         checkStatus();
@@ -92,7 +109,13 @@
 
                                 const serverName = this.id.replace('restart-', '');
                                 fetch(`/restart/${serverName}`)
-                                    .then(response => response.text())
+                                    .then(response => {
+                                        if (response.status === 401) {
+                                            window.location.href = "/login";
+                                        } else {
+                                            return response.text();
+                                        }
+                                    })
                                     .then(data => {
                                         console.log(`Server ${serverName} restart status: ${data}`);
                                         checkStatus();
@@ -101,6 +124,8 @@
                                     });
                             });
                         });
+
+
                     </script>
 
                 </div>
@@ -108,7 +133,14 @@
             {% endfor %}
         </ul>
         <div>
-            <a href="{{ url_for('logout') }}" class="btn btn-secondary rightalign btn-logout">Logout</a>
+            <!--            <a href="{{ url_for('logout') }}" class="btn btn-secondary rightalign btn-logout">Logout</a>-->
+            <a class="btn btn-secondary rightalign btn-logout" href="{{ url_for('logout') }}">
+                {% if not current_user.is_authenticated %}
+                Login
+                {% else %}
+                Logout
+                {% endif %}
+            </a>
         </div>
     </div>
 </div>
