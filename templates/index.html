@@ -9,8 +9,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class="container">
     <div class="text-center my-4">
-        <img src="{{ url_for('static', filename='images/logo.webp') }}" alt="My Image">
-        <h1>Black Squadron Gaming Server Manager</h1>
+        <a href="{{ url_for('index') }}" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='images/logo.webp') }}" alt="My Image">
+            <h1>Black Squadron Gaming Server Manager</h1>
+        </a>
     </div>
     <div class="card">
         <ul class="list-group list-group-flush">
@@ -34,6 +36,7 @@
                         }
                         checkStatus();
                         setInterval(checkStatus, 5000);
+
 
 
 
@@ -124,6 +127,7 @@
                                     });
                             });
                         });
+
 
 
                     </script>
