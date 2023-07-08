@@ -9,7 +9,7 @@
     },
     {
       "name": "Squad",
-      "start": "/home/game/SquadServer/startserver.sh",
+      "start": "/home/game/SquadGameServer/startserver.sh",
       "stop": "",
       "screen": "squad"
     },

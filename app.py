@@ -34,7 +34,7 @@ class ServerController:
         if self.check_status() == "offline":
             return f"Server {self.server['name']} is already offline"
         if self.server['stop'] == "":
-            subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
+            subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', '^C^C^C'])
         else:
             subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', self.server['stop'] + '\n'])
         sleep(15) #Some games take a while to shut down properly.
@@ -117,6 +117,7 @@ def index():
 @app.route('/start/<name>')
 @login_required
 def start(name):
+    name = name.replace('_', ' ')
     controller = server_controllers.get(name)
     if controller:
         controller.start()
@@ -125,6 +126,7 @@ def start(name):
 @app.route('/stop/<name>')
 @login_required
 def stop(name):
+    name = name.replace('_', ' ')
     controller = server_controllers.get(name)
     if controller:
         controller.stop()
@@ -133,6 +135,7 @@ def stop(name):
 @app.route('/restart/<name>')
 @login_required
 def restart(name):
+    name = name.replace('_', ' ')
     controller = server_controllers.get(name)
     if controller:
         controller.restart()
@@ -140,5 +143,6 @@ def restart(name):
 @app.route('/check/<name>')
 @login_required
 def checkStatus(name):
+    name = name.replace('_', ' ')
     controller = server_controllers.get(name)
     return controller.check_status() if controller else f"No server found with the name {name}"
