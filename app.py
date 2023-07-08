@@ -26,19 +26,19 @@ class ServerController:
     def start(self):
         if self.check_status() == "online":
             return f"Server {self.server['name']} is already online"
-        subprocess.run(['screen', '-dmS', self.server['screen']])
+        subprocess.run(['/usr/bin/screen', '-dmS', self.server['screen']])
         sleep(1)
-        subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', self.server['start'] + '\n'])
+        subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', self.server['start'] + '\n'])
 
     def stop(self):
         if self.check_status() == "offline":
             return f"Server {self.server['name']} is already offline"
         if self.server['stop'] == "":
-            subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
+            subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', '^C'])
         else:
-            subprocess.run(['screen', '-S', self.server['screen'], '-X', 'stuff', self.server['stop'] + '\n'])
+            subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', self.server['stop'] + '\n'])
         sleep(15) #Some games take a while to shut down properly.
-        subprocess.run(['screen', '-S', self.server['screen'], '-X', 'quit'])
+        subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'quit'])
 
     def restart(self):
         if self.check_status() == "online":
@@ -48,7 +48,7 @@ class ServerController:
             self.start()
 
     def check_status(self):
-        result = subprocess.run(['screen', '-ls'], stdout=subprocess.PIPE)
+        result = subprocess.run(['/usr/bin/screen', '-ls'], stdout=subprocess.PIPE)
         output = result.stdout.decode()
         if output.startswith('No Sockets') or self.server['screen'] not in output:
             return "offline"
