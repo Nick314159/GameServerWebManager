@@ -12,13 +12,6 @@ body {
     color: #f3f3f3;
 }
 
-.status-indicator {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-}
-
 .btn {
     border: 1px solid #f3f3f3;
 }
@@ -61,9 +54,65 @@ body {
     top:5px;
 }
 
-.center {
+.center-login {
  border: 5px solid;
   margin: auto;
   width: 270px;
   padding: 10px;
+}
+
+.server-indicator {
+    display: inline-block;
+    width: 20px;
+    border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+  .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+
+    .server-indicator {
+        height: 20px;
+        position: relative;
+        right: 2px;
+        top: 1px;
+    }
+
+  .rightalign {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 768px) {
+   .server-name {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Updated to center the content vertically */
+        align-items: center; /* Updated to center the content horizontally */
+        text-align: center;
+    }
+
+    .server-indicator{
+        position: relative;
+        left: 5px;
+        bottom: 3px;
+    }
+
+    .center {
+      margin: auto;
+      width: 100%;
+      padding: 10px;
+    }
+
+    .server-controls {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        padding-top: 10px;
+    }
 }

@@ -122,7 +122,9 @@ def logout():
 @app.route('/')
 @app.route('/dashboard')
 def index():
-    return render_template('index.html', servers=servers)
+    user_agent = request.headers.get('User-Agent')
+    is_mobile = 'Mobile' in user_agent
+    return render_template('index.html', servers=servers, is_mobile=is_mobile)
 
 
 @app.route('/start/<name>')

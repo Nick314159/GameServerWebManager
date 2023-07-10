@@ -18,26 +18,35 @@
         <ul class="list-group list-group-flush">
             {% for server in servers %}
             <li class="list-group-item">
-                <div class="col text-left" style="display: inline-block;">
-                    <h3 class="inline-header">{{ server.name }}</h3>
+
+                {% if is_mobile %}
+                <div class="server-name center" style="display: inline-block;">
+                    <h3 class="inline-header">{{ server.name }} </h3>
+                    <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="server-indicator">&nbsp;</div>
                 </div>
-                <div class="col rightalign" style="display: inline-block;">
-                    <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="status-indicator">&nbsp;</div>
+                <div class="server-controls">
+                    {% else %}
+                    <div class="col text-left server-name" style="display: inline-block;">
+                        <h3 class="inline-header">{{ server.name }}</h3>
+                    </div>
+                    <div class="server-controls">
+                        <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="server-indicator">&nbsp;
+                        </div>
+                        {% endif %}
+                        <button id="start-{{ server.name.replace(' ', '_') }}"
+                                class="spinner-button btn btn-success start-server"><i
+                                class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
+                        </button>
+                        <button id="stop-{{ server.name.replace(' ', '_') }}"
+                                class="spinner-button btn btn-danger stop-server"><i
+                                class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Shutdown
+                        </button>
+                        <button id="restart-{{ server.name.replace(' ', '_') }}"
+                                class="spinner-button btn btn-warning restart-server"><i
+                                class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
+                        </button>
 
-                    <button id="start-{{ server.name.replace(' ', '_') }}"
-                            class="spinner-button btn btn-success start-server"><i
-                            class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
-                    </button>
-                    <button id="stop-{{ server.name.replace(' ', '_') }}"
-                            class="spinner-button btn btn-danger stop-server"><i
-                            class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Shutdown
-                    </button>
-                    <button id="restart-{{ server.name.replace(' ', '_') }}"
-                            class="spinner-button btn btn-warning restart-server"><i
-                            class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
-                    </button>
-
-                    <script>
+                        <script>
                         function checkStatus() {
                             {% for server in servers %}
                             fetch('/check/{{ server.name }}')
@@ -127,9 +136,19 @@
 
 
 
-                    </script>
 
-                </div>
+
+
+
+
+
+
+
+
+
+                        </script>
+
+                    </div>
             </li>
             {% endfor %}
         </ul>
