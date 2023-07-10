@@ -1,5 +1,5 @@
 from time import sleep
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request,send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
 from flask_limiter import Limiter
@@ -86,6 +86,11 @@ class User(UserMixin):
         self.id = id
 
 users = {user['username']: user['password'] for user in config['users']}
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/images'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 # Tell flask-login how to load a user
