@@ -1,15 +1,16 @@
 {% extends "bootstrap/base.html" %}
-
+{% block title %}
+BKSQ Login
+{% endblock %}
 {% block content %}
 <head>
     <!-- Other head elements -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Your CSS file link -->
-    <title>BKSQ Login</title>
 </head>
 <div class="text-center my-4">
     <a href="{{ url_for('index') }}" style="text-decoration: none; color: inherit;">
         <img src="{{ url_for('static', filename='images/logo.webp') }}" alt="My Image">
-        <h1>Black Squadron Gaming Server Manager</h1>
+        <h1>Black Squadron Gaming Server Web Manager</h1>
     </a>
 </div>
 <div class="center-login">
