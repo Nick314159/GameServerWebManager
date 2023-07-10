@@ -1,8 +1,10 @@
 from time import sleep
 from flask import request
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import subprocess
 import bcrypt
 import os
@@ -12,13 +14,13 @@ app = Flask("BlackSquadronGamingServerManager")
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 Bootstrap(app)
 
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
 
-# servers = [
-#     {'name': 'Arma3', 'start': '/home/game/Arma3Server/startServer.sh', 'screen': 'arma3', 'status': 'unknown'},
-#     {'name': 'Squad', 'start': 'home/game/SquadServer/startServer.sh', 'screen': 'squad', 'status': 'unknown'},
-#     {'name': 'test', 'start': './test.sh', 'screen': 'test', 'status': 'unknown'},
-#     {'name': 'Wreckfest', 'start': 'home/game/WreckfestServer/startServer.sh', 'screen': 'wreckfest','status': 'unknown'}
-# ]
 class ServerController:
     def __init__(self, server):
         self.server = server
@@ -86,6 +88,7 @@ def load_user(user_id):
 
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5/minute")
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
