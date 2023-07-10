@@ -1,10 +1,13 @@
 from time import sleep
-from flask import request
 from flask import Flask, render_template, redirect, url_for, request
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from wtforms.validators import DataRequired
+import bleach
 import subprocess
 import bcrypt
 import os
@@ -71,7 +74,11 @@ servers = [controller.to_dict() for controller in server_controllers.values()]
 # Setup Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  # Name of the login view
+login_manager.login_view = 'login'
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = StringField('Password', validators=[DataRequired()])
 
 # Mock user
 class User(UserMixin):
@@ -91,15 +98,17 @@ def load_user(user_id):
 @limiter.limit("5/minute")
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        user = next((user for user in config['users'] if user['username'] == username), None)
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
-            user_obj = User(username)
-            login_user(user_obj)
-            return redirect(url_for('index'))
-        else:
-            return "Invalid credentials", 401
+        form = LoginForm()
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
+            user = next((user for user in config['users'] if user['username'] == username), None)
+            if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+                user_obj = User(username)
+                login_user(user_obj)
+                return redirect(url_for('index'))
+            else:
+                return "Invalid credentials", 401
     else:
         return render_template('login.html')
 
@@ -119,6 +128,7 @@ def index():
 
 @app.route('/start/<name>')
 def start(name):
+    name = bleach.clean(name)
     if current_user.is_authenticated:
         name = name.replace('_', ' ')
         controller = server_controllers.get(name)
@@ -129,6 +139,7 @@ def start(name):
 
 @app.route('/stop/<name>')
 def stop(name):
+    name = bleach.clean(name)
     if current_user.is_authenticated:
         name = name.replace('_', ' ')
         controller = server_controllers.get(name)
@@ -139,6 +150,7 @@ def stop(name):
 
 @app.route('/restart/<name>')
 def restart(name):
+    name = bleach.clean(name)
     if current_user.is_authenticated:
         name = name.replace('_', ' ')
         controller = server_controllers.get(name)
@@ -149,6 +161,7 @@ def restart(name):
 
 @app.route('/check/<name>')
 def checkStatus(name):
+    name = bleach.clean(name)
     name = name.replace('_', ' ')
     controller = server_controllers.get(name)
     return controller.check_status() if controller else f"No server found with the name {name}"
