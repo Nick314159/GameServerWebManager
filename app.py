@@ -161,6 +161,7 @@ def restart(name):
         return "Unauthorized", 401
 
 @app.route('/check/<name>')
+@limiter.limit("1000/minute")
 def checkStatus(name):
     name = bleach.clean(name)
     name = name.replace('_', ' ')
