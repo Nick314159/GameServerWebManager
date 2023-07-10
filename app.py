@@ -99,16 +99,15 @@ def load_user(user_id):
 def login():
     if request.method == 'POST':
         form = LoginForm()
-        if form.validate_on_submit():
-            username = form.username.data
-            password = form.password.data
-            user = next((user for user in config['users'] if user['username'] == username), None)
-            if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
-                user_obj = User(username)
-                login_user(user_obj)
-                return redirect(url_for('index'))
-            else:
-                return "Invalid credentials", 401
+        username = form.username.data
+        password = form.password.data
+        user = next((user for user in config['users'] if user['username'] == username), None)
+        if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+            user_obj = User(username)
+            login_user(user_obj)
+            return redirect(url_for('index'))
+        else:
+            return "Invalid credentials", 401
     else:
         return render_template('login.html')
 
