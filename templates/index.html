@@ -23,24 +23,7 @@
                 </div>
                 <div class="col rightalign" style="display: inline-block;">
                     <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="status-indicator">&nbsp;</div>
-                    <script>
-                        function checkStatus() {
-                            {% for server in servers %}
-                            fetch('/check/{{ server.name }}')
-                                .then(response => response.text())
-                                .then(data => {
-                                    const serverStatusIndicator = document.querySelector('#{{ server.name.replace(' ', '_') }}-status-indicator');
-                                    serverStatusIndicator.style.backgroundColor = data === 'online' ? 'green' : 'red';
-                                });
-                            {% endfor %}
-                        }
-                        checkStatus();
-                        setInterval(checkStatus, 5000);
 
-
-
-
-                    </script>
                     <button id="start-{{ server.name.replace(' ', '_') }}"
                             class="spinner-button btn btn-success start-server"><i
                             class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
@@ -55,6 +38,19 @@
                     </button>
 
                     <script>
+                        function checkStatus() {
+                            {% for server in servers %}
+                            fetch('/check/{{ server.name }}')
+                                .then(response => response.text())
+                                .then(data => {
+                                    const serverStatusIndicator = document.querySelector('#{{ server.name.replace(' ', '_') }}-status-indicator');
+                                    serverStatusIndicator.style.backgroundColor = data === 'online' ? 'green' : 'red';
+                                });
+                            {% endfor %}
+                        }
+                        checkStatus();
+                        setInterval(checkStatus, 5000);
+
                         // For the Start buttons
                         document.querySelectorAll('.start-server').forEach(button => {
                             button.addEventListener('click', function(event) {
@@ -127,6 +123,7 @@
                                     });
                             });
                         });
+
 
 
 
