@@ -20,6 +20,12 @@
       "screen": "unity"
     },
     {
+      "name": "Virtual Table Top",
+      "start": "/home/game/VirtualTableTop/startserver.sh",
+      "stop": "",
+      "screen": "vtt"
+    },
+    {
       "name": "Wreckfest",
       "start": "/home/game/WreckfestServer/startserver.sh",
       "stop": "",
@@ -29,7 +35,7 @@
   "users": [
     {
       "username": "admin",
-      "password": "$2b$12$6GcIluHQNjuNyf/DjvPxJ.vT3iXobF3PNmN4IjpykzgR4/gLyRaE2"
+      "password": "someHashedString"
     }
   ]
 }
