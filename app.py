@@ -12,10 +12,22 @@ import subprocess
 import bcrypt
 import os
 import json
+import logging
 
 app = Flask("BlackSquadronGamingServerManager")
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
+
+logging.basicConfig(filename='app.log', level=logging.INFO,
+                        format='%(asctime)s %(levelname)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+
 Bootstrap(app)
+
+
+
+logging.info('Starting the application')
+logging.warning('This is a warning message')
+logging.error('This is an error message')
 
 limiter = Limiter(
     get_remote_address,
@@ -31,13 +43,18 @@ class ServerController:
     def start(self):
         if self.check_status() == "online":
             return f"Server {self.server['name']} is already online"
+        logging.info('Starting ' +self.server['screen'])
+        logging.info('Starting screen session for ' +self.server['screen'])
         subprocess.run(['/usr/bin/screen', '-dmS', self.server['screen']])
         sleep(1)
+        logging.info('Starting game server for ' +self.server['screen'])
         subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', self.server['start'] + '\n'])
 
     def stop(self):
         if self.check_status() == "offline":
             return f"Server {self.server['name']} is already offline"
+
+        logging.info('Stopping ' +self.server['screen'])
 
         # List all screen sessions
         result = subprocess.run(['/usr/bin/screen', '-ls'], stdout=subprocess.PIPE, text=True)
@@ -46,16 +63,21 @@ class ServerController:
         # Find sessions that match the server's screen name pattern
         pattern = self.server['screen']
         matching_sessions = [line.split()[0] for line in output.splitlines() if pattern in line]
+        logging.info('Found '+str(len(matching_sessions))+" session(s) for " +self.server['screen'])
+
 
         for session in matching_sessions:
+            logging.info('Stopping game server for ' + session)
             if self.server['stop'] == "":
                 subprocess.run(['/usr/bin/screen', '-S', session, '-X', 'stuff', '^C^C^C'])
             else:
                 subprocess.run(['/usr/bin/screen', '-S', session, '-X', 'stuff', self.server['stop'] + '\n'])
             sleep(15) #Some games take a while to shut down properly.
+            logging.info('Stopping screen session for ' + session)
             subprocess.run(['/usr/bin/screen', '-S', session, '-X', 'quit'])
 
     def restart(self):
+        logging.info('Restarting server for ' + self.server['screen'])
         if self.check_status() == "online":
             self.stop()
         sleep(3)
