@@ -38,12 +38,22 @@ class ServerController:
     def stop(self):
         if self.check_status() == "offline":
             return f"Server {self.server['name']} is already offline"
-        if self.server['stop'] == "":
-            subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', '^C^C^C'])
-        else:
-            subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', self.server['stop'] + '\n'])
-        sleep(15) #Some games take a while to shut down properly.
-        subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'quit'])
+
+        # List all screen sessions
+        result = subprocess.run(['/usr/bin/screen', '-ls'], stdout=subprocess.PIPE, text=True)
+        output = result.stdout
+
+        # Find sessions that match the server's screen name pattern
+        pattern = self.server['screen']
+        matching_sessions = [line.split()[0] for line in output.splitlines() if pattern in line]
+
+        for session in matching_sessions:
+            if self.server['stop'] == "":
+                subprocess.run(['/usr/bin/screen', '-S', session, '-X', 'stuff', '^C^C^C'])
+            else:
+                subprocess.run(['/usr/bin/screen', '-S', session, '-X', 'stuff', self.server['stop'] + '\n'])
+            sleep(15) #Some games take a while to shut down properly.
+            subprocess.run(['/usr/bin/screen', '-S', session, '-X', 'quit'])
 
     def restart(self):
         if self.check_status() == "online":
@@ -131,8 +141,8 @@ def index():
     is_mobile = 'Mobile' in user_agent
     return render_template('index.html', servers=servers, is_mobile=is_mobile)
 
-
 @app.route('/start/<name>')
+@limiter.limit("1/second")
 def start(name):
     name = bleach.clean(name)
     if current_user.is_authenticated:
