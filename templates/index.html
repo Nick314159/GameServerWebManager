@@ -34,6 +34,7 @@ BKSQ Games
                         <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="server-indicator">&nbsp;
                         </div>
                         {% endif %}
+                        {% if current_user.is_authenticated %}
                         <button id="start-{{ server.name.replace(' ', '_') }}"
                                 class="spinner-button btn btn-success start-server"><i
                                 class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
@@ -46,6 +47,7 @@ BKSQ Games
                                 class="spinner-button btn btn-warning restart-server"><i
                                 class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
                         </button>
+                        {% endif %}
 
                         <script>
                         function checkStatus() {
