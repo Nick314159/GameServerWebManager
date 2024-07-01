@@ -84,6 +84,12 @@ class ServerController:
         if self.check_status() == "offline":
             self.start()
 
+    def save(self):
+        logging.info('Backing up ' +self.server['name'] + '...')
+        subprocess.run([self.server['save']])
+        logging.info(self.server['name'] + ' backup complete.')
+
+
     def check_status(self):
         result = subprocess.run(['/usr/bin/screen', '-ls'], stdout=subprocess.PIPE)
         output = result.stdout.decode()
@@ -172,6 +178,9 @@ def start(name):
         controller = server_controllers.get(name)
         if controller:
             controller.start()
+            return f"Server {name} started succefully", 200
+        else:
+            return f"No server found with the name {name}", 404
     else:
         return "Unauthorized", 401
 
@@ -183,6 +192,9 @@ def stop(name):
         controller = server_controllers.get(name)
         if controller:
             controller.stop()
+            return f"Server {name} stopped succefully", 200
+        else:
+            return f"No server found with the name {name}", 404
     else:
         return "Unauthorized", 401
 
@@ -194,6 +206,24 @@ def restart(name):
         controller = server_controllers.get(name)
         if controller:
             controller.restart()
+            return f"Server {name} restarted succefully", 200
+        else:
+            return f"No server found with the name {name}", 404
+    else:
+        return "Unauthorized", 401
+
+@app.route('/save/<name>')
+@limiter.limit("1/second")
+def save(name):
+    name = bleach.clean(name)
+    if current_user.is_authenticated:
+        name = name.replace('_', ' ')
+        controller = server_controllers.get(name)
+        if controller:
+            controller.save()
+            return f"Server {name} saved succefully", 200
+        else:
+            return f"No server found with the name {name}", 404
     else:
         return "Unauthorized", 401
 

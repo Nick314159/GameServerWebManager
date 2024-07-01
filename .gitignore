@@ -4,3 +4,4 @@ config.json
 venv/
 app.log
 
+node_modules

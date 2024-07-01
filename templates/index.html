@@ -35,6 +35,14 @@ BKSQ Games
                         </div>
                         {% endif %}
                         {% if current_user.is_authenticated %}
+                        
+                        {% if server.save %}
+                        <button id="save-{{ server.name.replace(' ', '_') }}"
+                                class="spinner-button btn btn-warning save-server"><i
+                                class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Save
+                        </button>
+                        {% endif %}
+                       
                         <button id="start-{{ server.name.replace(' ', '_') }}"
                                 class="spinner-button btn btn-success start-server"><i
                                 class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Start
@@ -136,18 +144,29 @@ BKSQ Games
                             });
                         });
 
+                         // For the Save buttons
+                         document.querySelectorAll('.save-server').forEach(button => {
+                            button.addEventListener('click', function(event) {
+                                event.preventDefault();
 
+                                $(this).find('.fa-circle-o-notch').show();
 
-
-
-
-
-
-
-
-
-
-
+                                const serverName = this.id.replace('save-', '');
+                                fetch(`/save/${serverName}`)
+                                    .then(response => {
+                                        if (response.status === 401) {
+                                            window.location.href = "/login";
+                                        } else {
+                                            return response.text();
+                                        }
+                                    })
+                                    .then(data => {
+                                        console.log(`Server ${serverName} save status: ${data}`);
+                                        checkStatus();
+                                        $(this).find('.fa-circle-o-notch').hide();
+                                    });
+                            });
+                        });
 
                         </script>
 
