@@ -13,6 +13,7 @@ import bcrypt
 import os
 import json
 import logging
+import datetime
 
 app = Flask("BlackSquadronGamingServerManager")
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
@@ -98,9 +99,17 @@ class ServerController:
         else:
             return "online"
 
-    def to_dict(self):
-        return self.server
+    def get_last_save_timestamp(self):
+        #This expect the backup.tar.gz to be alongside the backup.sh from the save parameter in config, will need to make another config parameter if these are to be sepeerate.
+        save_file = self.server['save'].replace('.sh', '.tar.gz')
+        if os.path.exists(save_file):
+            return os.path.getmtime(save_file)
+        return None
 
+    def to_dict(self):
+        server_dict = self.server.copy()
+        server_dict['last_saved'] = self.get_last_save_timestamp()
+        return server_dict
 
 # Load server data from a JSON file
 with open('config.json', 'r') as file:
@@ -226,6 +235,30 @@ def save(name):
             return f"No server found with the name {name}", 404
     else:
         return "Unauthorized", 401
+    
+@app.route('/last_saved/<name>')
+@limiter.limit("1/second")
+def last_saved(name):
+    name = bleach.clean(name)
+    name = name.replace('_', ' ')
+    controller = server_controllers.get(name)
+    if controller:
+        timestamp = controller.get_last_save_timestamp()
+        if timestamp:
+            formatted_date = datetimeformat(timestamp)
+            return {"formatted_date": formatted_date}, 200
+        else:
+            return {"error": "No backup found"}, 404
+    else:
+        return {"error": "No server found with the name " + name}, 404
+
+@app.template_filter('format_datetime')
+def datetimeformat(value, format='%Y-%m-%d %H:%M:%S'):
+    """Format a date time to (Default): yyyy-mm-dd H:M:S"""
+    # return datetime.datetime.fromtimestamp(value).strftime(format)
+    date = datetime.datetime.fromtimestamp(value)
+    suffix = 'th' if 11 <= date.day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(date.day % 10, 'th')
+    return date.strftime(f'%a %B {date.day}{suffix}, %I:%M %p')
 
 @app.route('/check/<name>')
 @limiter.limit("1000/minute")
@@ -234,3 +267,4 @@ def checkStatus(name):
     name = name.replace('_', ' ')
     controller = server_controllers.get(name)
     return controller.check_status() if controller else f"No server found with the name {name}"
+

@@ -30,7 +30,14 @@ BKSQ Games
                     <div class="col text-left server-name" style="display: inline-block;">
                         <h3 class="inline-header">{{ server.name }}</h3>
                     </div>
+                    
+                    {% if server.save %}
+                    <div class="server-controls-with-save">
+                    {% else %}
                     <div class="server-controls">
+                    {% endif %}
+
+
                         <div id="{{ server.name.replace(' ', '_') }}-status-indicator" class="server-indicator">&nbsp;
                         </div>
                         {% endif %}
@@ -55,6 +62,12 @@ BKSQ Games
                                 class="spinner-button btn btn-warning restart-server"><i
                                 class="fa fa-circle-o-notch fa-spin" style="display:none;"></i> Restart
                         </button>
+                        {% if server.save %}
+                        <p id="last-saved-{{ server.name.replace(' ', '_') }}" class="last-saved">
+                            Last saved {% if server.last_saved %} on {{ server.last_saved | format_datetime }} {% else %} never {% endif %}
+                        </p>
+                        {% endif %}
+
                         {% endif %}
 
                         <script>
@@ -70,6 +83,19 @@ BKSQ Games
                         }
                         checkStatus();
                         setInterval(checkStatus, 5000);
+
+
+                        function updateLastSaved(serverName) {
+                            fetch(`/last_saved/${serverName}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.formatted_date) {
+                                        const lastSavedElement = document.querySelector(`#last-saved-${serverName}`);
+                                        lastSavedElement.textContent = `Last saved on ${data.formatted_date}`;
+                                    }
+                                })
+                                .catch(error => console.error('Error:', error));
+                        }
 
                         // For the Start buttons
                         document.querySelectorAll('.start-server').forEach(button => {
@@ -163,11 +189,20 @@ BKSQ Games
                                     .then(data => {
                                         console.log(`Server ${serverName} save status: ${data}`);
                                         checkStatus();
+                                        updateLastSaved(serverName);
                                         $(this).find('.fa-circle-o-notch').hide();
                                     });
                             });
                         });
 
+                 
+                        document.addEventListener('DOMContentLoaded', (event) => {
+                            {% for server in servers %}
+                                {% if server.save %}
+                                    updateLastSaved('{{ server.name.replace(' ', '_') }}');
+                                {% endif %}
+                            {% endfor %}
+                        });
                         </script>
 
                     </div>

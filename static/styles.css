@@ -68,6 +68,16 @@ body {
     position: relative;
 }
 
+.last-saved {
+    text-align: center;
+
+}
+
+.server-controls-with-save{
+    align-items: center;
+    margin-top: 12px;
+}
+
 @media (min-width: 768px) {
   .list-group-item {
       display: flex;
