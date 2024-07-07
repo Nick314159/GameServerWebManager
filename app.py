@@ -46,10 +46,17 @@ class ServerController:
             return f"Server {self.server['name']} is already online"
         logging.info('Starting ' +self.server['screen'])
         logging.info('Starting screen session for ' +self.server['screen'])
-        subprocess.run(['/usr/bin/screen', '-dmS', self.server['screen']])
+        subprocess.run(['/usr/bin/screen', '-dmS', self.server['screen']]) #The -m forces the creation of a new session, but if its already online, how did it get to this point. Also, it must be calling this method twice from higher up, why??
         sleep(1)
         logging.info('Starting game server for ' +self.server['screen'])
         subprocess.run(['/usr/bin/screen', '-S', self.server['screen'], '-X', 'stuff', self.server['start'] + '\n'])
+
+        #This is a workaround to the app starting multiple screen sessions, I cannot identify why it is doing that, so unfornuatly im stuck with this recursive call. 
+        sleep(1)
+        while self.check_for_duplicate_screens():
+            self.stop()
+            sleep(1)
+            self.start()
 
     def stop(self):
         if self.check_status() == "offline":
@@ -98,6 +105,16 @@ class ServerController:
             return "offline"
         else:
             return "online"
+        
+    def check_for_duplicate_screens(self):
+        result = subprocess.run(['/usr/bin/screen', '-ls'], stdout=subprocess.PIPE)
+        output = result.stdout.decode()
+        lines = output.splitlines()
+    
+        # Find lines that contain the session name
+        matching_sessions = [line for line in lines if self.server['screen'] in line]
+        
+        return True if len(matching_sessions) > 1 else False
 
     def get_last_save_timestamp(self):
         #This expect the backup.tar.gz to be alongside the backup.sh from the save parameter in config, will need to make another config parameter if these are to be sepeerate.
